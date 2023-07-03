@@ -182,7 +182,7 @@ def main():
     plt.xlim(-8, 8)
     plt.ylim(-8, 8)
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.savefig(f'{specchiandaNome}_da_{specchioNome}.png')
+    plt.savefig(f'{specchiandaNome}_from_{specchioNome}.png')
     plt.show()
 
 

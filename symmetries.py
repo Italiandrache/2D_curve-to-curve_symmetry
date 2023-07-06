@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import sympy as sp
 from itertools import islice
 import multiprocessing
+import time
 
 
 def notReal(x_t, tPy, t, tNum):
@@ -18,113 +19,113 @@ def returnValue(x_t, tPy, t, tNum):
         return x_t.subs(t, tNum)
     return x_t
 
-def curva(x_t, y_t, tPy, t, tNum):
+def curve(x_t, y_t, tPy, t, tNum):
     if notReal(x_t, tPy, t, tNum) or notReal(y_t, tPy, t, tNum):
         return 0, 0, False
     return returnValue(x_t, tPy, t, tNum), returnValue(y_t, tPy, t, tNum), True
 
-def getCoeffPerp(xPrimo_t, yPrimo_t, tPy, t, tNum):
-    yPrimo = returnValue(yPrimo_t, tPy, t, tNum)
-    xPrimo = returnValue(xPrimo_t, tPy, t, tNum)
-    if yPrimo != 0 and xPrimo != 0:
-        return -xPrimo/yPrimo #-1/coeff tan
-    elif xPrimo == 0:
+def getCoeffPerp(xPrime_t, yPrime_t, tPy, t, tNum):
+    yPrime = returnValue(yPrime_t, tPy, t, tNum)
+    xPrime = returnValue(xPrime_t, tPy, t, tNum)
+    if yPrime != 0 and xPrime != 0:
+        return -xPrime/yPrime #-1/coeff tan
+    elif xPrime == 0:
         return 0
     else:
         return np.inf
 
-def segmenta(xSpecchianda_t, ySpecchianda_t, tPy, t, tRange):
-    xSegmentoList = []
-    ySegmentoList = []
+def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange):
+    xSegmentList = []
+    ySegmentList = []
     tNum_1List = []
     tNum_2List = []
     q = sp.Symbol('q', real = True)
     for i in range(0, len(tRange)-1):
         tNum_1 = tRange[i]
         tNum_2 = tRange[i+1]
-        xSpecchianda_1, ySpecchianda_1, reale_1 = curva(xSpecchianda_t, ySpecchianda_t, tPy, t, tNum_1)
-        xSpecchianda_2, ySpecchianda_2, reale_2 = curva(xSpecchianda_t, ySpecchianda_t, tPy, t, tNum_2)
-        if not reale_1 or not reale_2:
+        xToBeMirrored_1, yToBeMirrored_1, real_1 = curve(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tNum_1)
+        xToBeMirrored_2, yToBeMirrored_2, real_2 = curve(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tNum_2)
+        if not real_1 or not real_2:
             continue
-        xSegmentoList += [xSpecchianda_1+q*(xSpecchianda_2-xSpecchianda_1)]
-        ySegmentoList += [ySpecchianda_1+q*(ySpecchianda_2-ySpecchianda_1)]
+        xSegmentList += [xToBeMirrored_1+q*(xToBeMirrored_2-xToBeMirrored_1)]
+        ySegmentList += [yToBeMirrored_1+q*(yToBeMirrored_2-yToBeMirrored_1)]
         tNum_1List += [tNum_1]
         tNum_2List += [tNum_2]
-    return xSegmentoList, ySegmentoList, tNum_1List, tNum_2List
+    return xSegmentList, ySegmentList, tNum_1List, tNum_2List
 
-def intersez(xSpecchio, ySpecchio, coeff, xSegmentoList, ySegmentoList, qNum_1List, qNum_2List, tNum, xSpecchio_t, ySpecchio_t, xSpecchianda_q, ySpecchianda_q, tPy, qPy):
-    intersezioni = []
+def intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, qNum_2List, tNum, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, tPy, qPy):
+    intersections = []
     q = sp.Symbol('q', real = True)
     t = sp.Symbol('t', real = True)
     r = sp.Symbol('r', real = True)
-    for i in range(0, len(xSegmentoList)-1):
-        xRetta_r = xSpecchio+r if coeff != np.inf else xSpecchio
-        yRetta_r = ySpecchio+r*coeff if coeff != np.inf else r
+    for i in range(0, len(xSegmentList)-1):
+        xLine_r = xMirror+r if coeff != np.inf else xMirror
+        yLine_r = yMirror+r*coeff if coeff != np.inf else r
 
-        intersezione = None
+        intersection = None
         try: #could be done more efficiently with some if/else
-            intersezione = sp.linsolve([xSegmentoList[i]-xRetta_r, ySegmentoList[i]-yRetta_r], q, r)
-            qNum, rNum = list(intersezione)[0] #if the same, qNum is symbolical. If without intersections, length is 0
+            intersection = sp.linsolve([xSegmentList[i]-xLine_r, ySegmentList[i]-yLine_r], q, r)
+            qNum, rNum = list(intersection)[0] #if the same, qNum is symbolical. If without intersections, length is 0
             if r in qNum.free_symbols or q in qNum.free_symbols:
-                coin, specchianda_1Tupla, specchianda_2Tupla = coincidenti(xSpecchio_t, ySpecchio_t, t, tNum, xSpecchianda_q, ySpecchianda_q, q, qNum_1List[i], qNum_2List[i], coeff, tPy, qPy)
+                coin, toBeMirrored_1Tupla, toBeMirrored_2Tupla = coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], coeff, tPy, qPy)
                 if coin:
-                    intersezioni += [specchianda_1Tupla]
-                    intersezioni += [specchianda_2Tupla]
+                    intersections += [toBeMirrored_1Tupla]
+                    intersections += [toBeMirrored_2Tupla]
             elif 0 <= qNum <= 1:
-                intersezioni += [(xSegmentoList[i].subs(q, qNum), ySegmentoList[i].subs(q, qNum))]
+                intersections += [(xSegmentList[i].subs(q, qNum), ySegmentList[i].subs(q, qNum))]
         except ValueError:
             continue
         except IndexError:
             #probably just a continue would do
-            if len(list(intersezione)) != 0:
-                coin, specchianda_1Tupla, specchianda_2Tupla = coincidenti(xSpecchio_t, ySpecchio_t, t, tNum, xSpecchianda_q, ySpecchianda_q, q, qNum_1List[i], qNum_2List[i], coeff, tPy, qPy)
+            if len(list(intersection)) != 0:
+                coin, toBeMirrored_1Tupla, toBeMirrored_2Tupla = coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], coeff, tPy, qPy)
                 if coin:
-                    intersezioni += [specchianda_1Tupla]
-                    intersezioni += [specchianda_2Tupla]
-    return intersezioni
+                    intersections += [toBeMirrored_1Tupla]
+                    intersections += [toBeMirrored_2Tupla]
+    return intersections
 
-def linIndip(xSpecchio, ySpecchio, xSpecchianda_1, ySpecchianda_1, xSpecchianda_2, ySpecchianda_2):
+def linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2):
     a = sp.Symbol('a', real = True)
     b = sp.Symbol('b', real = True)
-    dipendenza = list(sp.linsolve([a*(xSpecchianda_1-xSpecchio)+b*(xSpecchianda_2-xSpecchio), a*(ySpecchianda_1-ySpecchio)+b*(ySpecchianda_2-ySpecchio)], a, b))
-    aNum, bNum = dipendenza[0]
+    dependency = list(sp.linsolve([a*(xToBeMirrored_1-xMirror)+b*(xToBeMirrored_2-xMirror), a*(yToBeMirrored_1-yMirror)+b*(yToBeMirrored_2-yMirror)], a, b))
+    aNum, bNum = dependency[0]
     if isinstance(aNum, int) and isinstance(bNum, int): #maybe useless
         if aNum == 0 and bNum == 0:
             return True
     return False
 
-def coincidenti(xSpecchio_t, ySpecchio_t, t, tNum, xSpecchianda_q, ySpecchianda_q, q, qNum_1, qNum_2, coeff, tPy, qPy):
-    xSpecchio = returnValue(xSpecchio_t, tPy, t, tNum)
-    ySpecchio = returnValue(ySpecchio_t, tPy, t, tNum)
-    xSpecchianda_1 = returnValue(xSpecchianda_q, qPy, q, qNum_1)
-    xSpecchianda_2 = returnValue(xSpecchianda_q, qPy, q, qNum_2)
-    ySpecchianda_1 = returnValue(ySpecchianda_q, qPy, q, qNum_1)
-    ySpecchianda_2 = returnValue(ySpecchianda_q, qPy, q, qNum_2)
-    if xSpecchianda_1 == xSpecchianda_2:
-        if not linIndip(xSpecchio, ySpecchio, xSpecchianda_1, ySpecchianda_1, xSpecchianda_2, ySpecchianda_2):
-            return (True, (xSpecchianda_1, ySpecchianda_1), (xSpecchianda_2, ySpecchianda_2))
-    elif abs(coeff - abs((ySpecchianda_2 - ySpecchianda_1))/abs((xSpecchianda_2 - xSpecchianda_1))) <= 0.0001 and not linIndip(xSpecchio, ySpecchio, xSpecchianda_1, ySpecchianda_1, xSpecchianda_2, ySpecchianda_2):
-        return (True, (xSpecchianda_1, ySpecchianda_1), (xSpecchianda_2, ySpecchianda_2))
+def coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1, qNum_2, coeff, tPy, qPy):
+    xMirror = returnValue(xMirror_t, tPy, t, tNum)
+    yMirror = returnValue(yMirror_t, tPy, t, tNum)
+    xToBeMirrored_1 = returnValue(xToBeMirrored_q, qPy, q, qNum_1)
+    xToBeMirrored_2 = returnValue(xToBeMirrored_q, qPy, q, qNum_2)
+    yToBeMirrored_1 = returnValue(yToBeMirrored_q, qPy, q, qNum_1)
+    yToBeMirrored_2 = returnValue(yToBeMirrored_q, qPy, q, qNum_2)
+    if xToBeMirrored_1 == xToBeMirrored_2:
+        if not linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2):
+            return (True, (xToBeMirrored_1, yToBeMirrored_1), (xToBeMirrored_2, yToBeMirrored_2))
+    elif abs(coeff - abs((yToBeMirrored_2 - yToBeMirrored_1))/abs((xToBeMirrored_2 - xToBeMirrored_1))) <= 0.00001 and not linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2):
+        return (True, (xToBeMirrored_1, yToBeMirrored_1), (xToBeMirrored_2, yToBeMirrored_2))
     return (False, (0, 0), (0, 0))
 
-def specchia(xSegmentoList, ySegmentoList, qNum_1List, qNum_2List, xSpecchio_t, ySpecchio_t, xSpecchianda_q, ySpecchianda_q, t, tRange, tPy, qPy, currentProcess, nProcesses, specchiataShared):
+def mirror(xSegmentList, ySegmentList, qNum_1List, qNum_2List, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, t, tRange, tPy, qPy, currentProcess, nProcesses, mirroredShared):
     tRange = islice(tRange, currentProcess, len(tRange), nProcesses)
-    xPrimo_t = sp.diff(xSpecchio_t, t) if isinstance(xSpecchio_t, sp.Basic) else 0
-    yPrimo_t = sp.diff(ySpecchio_t, t) if isinstance(ySpecchio_t, sp.Basic) else 0
+    xPrime_t = sp.diff(xMirror_t, t) if isinstance(xMirror_t, sp.Basic) else 0
+    yPrime_t = sp.diff(yMirror_t, t) if isinstance(yMirror_t, sp.Basic) else 0
     for tNum in tRange:
         print(tNum)
-        xSpecchio, ySpecchio, reale = curva(xSpecchio_t, ySpecchio_t, tPy, t, tNum)
-        if not reale:
+        xMirror, yMirror, real = curve(xMirror_t, yMirror_t, tPy, t, tNum)
+        if not real:
             continue
-        coeff = getCoeffPerp(xPrimo_t, yPrimo_t, tPy, t, tNum)
-        intersezioni = intersez(xSpecchio, ySpecchio, coeff, xSegmentoList, ySegmentoList, qNum_1List, qNum_2List, tNum, xSpecchio_t, ySpecchio_t, xSpecchianda_q, ySpecchianda_q, tPy, qPy)
-        for i in intersezioni:
-            specchiataShared.append(calcolaSimm(xSpecchio, ySpecchio, i[0], i[1]))
+        coeff = getCoeffPerp(xPrime_t, yPrime_t, tPy, t, tNum)
+        intersections = intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, qNum_2List, tNum, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, tPy, qPy)
+        for i in intersections:
+            mirroredShared.append(calcSimm(xMirror, yMirror, i[0], i[1]))
 
-def calcolaSimm(xSpecchio, ySpecchio, xSpecchiandaIntersezione, ySpecchiandaIntersezione):
-    return (2*xSpecchio-xSpecchiandaIntersezione, 2*ySpecchio-ySpecchiandaIntersezione)
+def calcSimm(xMirror, yMirror, xToBeMirroredIntersection, yToBeMirroredIntersection):
+    return (2*xMirror-xToBeMirroredIntersection, 2*yMirror-yToBeMirroredIntersection)
 
-def punti(x_t, y_t, tPy, t, tRange):
+def points(x_t, y_t, tPy, t, tRange):
     x_tList = []
     y_tList = []
     for tNum in tRange:
@@ -134,55 +135,65 @@ def punti(x_t, y_t, tPy, t, tRange):
         y_tList += [returnValue(y_t, tPy, t, tNum)]
     return x_tList, y_tList
 
+def generateRange(rangeValuesList):
+    return np.hstack([np.linspace(start, stop, num=num) for start, stop, num in rangeValuesList])
+
 def main():
-    specchioNome = "Specchio"
+    startTime = time.time()
+    
+    mirrorName = "Mirror" #placeholder name. Beware of only usig valid string characters
     t = sp.Symbol('t', real = True) #mirror
     tPy = "t"
-    xSpecchio_t = 4*sp.cos(t)*sp.cos(t)*sp.cos(t)
-    ySpecchio_t = 4*sp.sin(t)*sp.sin(t)*sp.sin(t) #placeholder function
-    tRange = np.linspace(0, 2*np.pi, num=2500) #placeholder function
-    #tRange.extend(np.linspace())
+    xMirror_t = 4*sp.cos(t)*sp.cos(t)*sp.cos(t) #placeholder function
+    yMirror_t = 4*sp.sin(t)*sp.sin(t)*sp.sin(t) #placeholder function
+    tRangeValuesList = [(0, 2*np.pi, 2500)] #placeholder range and density. The tuples are (start, stop, num), (extension_start, extension_stop, extension_num) etc
+    tRange = generateRange(tRangeValuesList)
+    #tRangePlot = np.linspace(0, 2*np.pi, num=100) #full parameter range to have a smooth plot of the curve, albeit doing the reflection calculations only for the limited interval of tRange
+    tRangePlot = tRange
 
-    specchiandaNome = "Specchianda"
+    toBeMirroredName = "ToBeMirrored" #Placeholder name. Beware of only using valid string characters
     q = sp.Symbol('q', real = True) #to be mirrored
     qPy = "q"
-    xSpecchianda_q = 4*sp.cos(q) #placeholder function
-    ySpecchianda_q = 4*sp.sin(q) #placeholder function
-    qRange = np.linspace(0, 2*np.pi, num=100)
-    #qRange.extend(np.linspace())
+    xToBeMirrored_q = 4*sp.cos(q) #placeholder function
+    yToBeMirrored_q = 4*sp.sin(q) #placeholder function
+    qRangeValuesList = [(0, 2*np.pi, 200)] #increasing these num values vastly increases computation time
+    qRange = generateRange(qRangeValuesList)
 
     plt.figure(num=0, dpi=150)
 
-    xSpecchioList, ySpecchioList = punti(xSpecchio_t, ySpecchio_t, tPy, t, tRange)
-    plt.plot(xSpecchioList, ySpecchioList)
-    xSpecchiandaList, ySpecchiandaList = punti(xSpecchianda_q, ySpecchianda_q, qPy, q, qRange)
-    plt.plot(xSpecchiandaList, ySpecchiandaList)
+    xMirrorList, yMirrorList = points(xMirror_t, yMirror_t, tPy, t, tRangePlot)
+    plt.plot(xMirrorList, yMirrorList)
+    xToBeMirroredList, yToBeMirroredList = points(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange)
+    plt.plot(xToBeMirroredList, yToBeMirroredList)
 
     manager = multiprocessing.Manager()
-    specchiataShared = manager.list()
+    mirroredShared = manager.list()
 
-    xSegmentoList, ySegmentoList, qNum_1List, qNum_2List = segmenta(xSpecchianda_q, ySpecchianda_q, qPy, q, qRange)
-    nProcesses, activeProcesses = 12, [] #for optimum performance don't exceed the number of physical cores of your CPU (x2 if SMT (AMD) or Hyper-Threading (Intel) is enabled)
+    xSegmentList, ySegmentList, qNum_1List, qNum_2List = segment(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange)
+    nProcesses, activeProcesses = 10, []
     for i in range(0, nProcesses):
-        process = multiprocessing.Process(target=specchia, args=(xSegmentoList, ySegmentoList, qNum_1List, qNum_2List, xSpecchio_t, ySpecchio_t, xSpecchianda_q, ySpecchianda_q, t, tRange, tPy, qPy, i, nProcesses, specchiataShared))
+        process = multiprocessing.Process(target=mirror, args=(xSegmentList, ySegmentList, qNum_1List, qNum_2List, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, t, tRange, tPy, qPy, i, nProcesses, mirroredShared))
         activeProcesses.append(process)
         process.start()
     for process in activeProcesses:
         process.join()
-    xSpecchiataList, ySpecchiataList = [], []
-    for specchiataPoints in specchiataShared:
-        xSpecchiataList.append(specchiataPoints[0])
-        ySpecchiataList.append(specchiataPoints[1])
-    plt.plot(xSpecchiataList, ySpecchiataList, '.')
+    xMirroredList, yMirroredList = [], []
+    for mirroredPoints in mirroredShared:
+        xMirroredList.append(mirroredPoints[0])
+        yMirroredList.append(mirroredPoints[1])
+    plt.plot(xMirroredList, yMirroredList, '.')
 
-    with open(f'{specchiandaNome}_from_{specchioNome}.csv', "w+") as file1:
-        for xSpecchiata, ySpecchiata in zip(xSpecchiataList, ySpecchiataList):
-            file1.write(f"{str(xSpecchiata)},{str(ySpecchiata)}{chr(10)}")
+    with open(f'{toBeMirroredName}_from_{mirrorName}.csv', "w+") as file1:
+        for xMirrored, yMirrored in zip(xMirroredList, yMirroredList):
+            file1.write(f"{str(xMirrored)},{str(yMirrored)}{chr(10)}")
 
-    plt.xlim(-8, 8)
-    plt.ylim(-8, 8)
+    plt.xlim(-8, 8) #placeholder values
+    plt.ylim(-8, 8) #placeholder values
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.savefig(f'{specchiandaNome}_from_{specchioNome}.png')
+    plt.savefig(f'{toBeMirroredName}_from_{mirrorName}.png', dpi=600)
+    endTime = time.time()
+    executionTime = endTime - startTime
+    print(f"Execution time: {executionTime} seconds.")
     plt.show()
 
 

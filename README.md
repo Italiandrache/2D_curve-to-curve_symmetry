@@ -19,6 +19,7 @@ Please note that the steps mentioned above describe the basic procedure of the c
 
 Finally, the code generates a plot showcasing the two parametric curves along with the symmetric curve (beware of defining appropriate x and y boundaries of the plot via ```plt.xlim(xMin, xMax)``` and ```plt.ylim(yMin, yMax)```). This plot is saved in the folder where the script was executed from. Additionally, a .csv file is generated containing the coordinates of the points of the mirrored curve, allowing you to easily export the data if needed.
 
+
 KNOWN BUG:
 
 As I had to make the assumption of using real-valued symbols, there may be certain cases in which sympy might not provide the accurate value in the ```getCoeffPerp``` function. For instance, if ```yPrime_t == float("sign(t)")```, then yPrime at tNum=0 should return ```float("nan")```. However, due to the assumption that the expression always is a real value, it is forced to return a real number, resulting in a value of 0 instead. This may lead to inaccurate mirroring, by reflecting points that shouldn't be. I'm currently working on fixing this bug, so it should be resolved with the next update.

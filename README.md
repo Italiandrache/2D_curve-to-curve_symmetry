@@ -1,5 +1,5 @@
 # 2D_curve-to-curve_symmetry
-This Python script determines the symmetric image of a given real-valued parametric curve with respect to another real-valued parametric differentiable curve in a 2D Cartesian plane. The latter curve is treated as the axis of reflection. The mirror curve equations are defined by ```xMirror_t``` and ```yMirror_t``` and his name by ```mirrorName```; for the to-be-mirrored curve we have ```xToBeMirrored_q```, ```yToBeMirrored_q``` and ```toBeMirroredName``` instead.
+This Python script determines the symmetric image of a given real-valued parametric curve with respect to another real-valued parametric differentiable curve in the 2D Cartesian plane. The latter curve is treated as the axis of reflection. The mirror curve equations are defined by ```xMirror_t``` and ```yMirror_t``` and his name by ```mirrorName```; for the to-be-mirrored curve we have ```xToBeMirrored_q```, ```yToBeMirrored_q``` and ```toBeMirroredName``` instead.
 
 I originally conceived this idea in 2015. The code is relatively slow because it employs sympy to perform the necessary mathematical computations. Therefore, I recommend utilizing multiprocessing for improved performance. You can define the number of concurrently active processes via the ```nProcesses``` value. For optimum performance don't exceed the number of physical cores of your CPU (x2 if SMT (AMD) or Hyper-Threading (Intel) is enabled).
 
@@ -18,3 +18,6 @@ The code operates by performing the following main steps:
 Please note that the steps mentioned above describe the basic procedure of the code, but the actual implementation involves additional considerations and optimizations.
 
 Finally, the code generates a plot showcasing the two parametric curves along with the symmetric curve (beware of defining appropriate x and y boundaries of the plot via ```plt.xlim(xMin, xMax)``` and ```plt.ylim(yMin, yMax)```). This plot is saved in the folder where the script was executed from. Additionally, a .csv file is generated containing the coordinates of the points of the mirrored curve, allowing you to easily export the data if needed.
+
+Known Bug:
+As I had to make the assumption of using real-valued symbols, there may be certain cases in which sympy might not provide the accurate value in the ```getCoeffPerp``` function. For instance, if ```yPrime_t == float("sign(t)")```, then yPrime at tNum=0 should return ```float("nan")```. However, due to the assumption that the expression always is a real value, it is forced to return a real number, resulting in a value of 0 instead. This may lead to inaccurate mirroring, by reflecting points that shouldn't be. I'm currently working on fixing this bug, so it should be resolved with the next update.

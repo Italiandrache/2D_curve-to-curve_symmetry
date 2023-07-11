@@ -32,10 +32,10 @@ def curve(x_t, y_t, tPy, t, tNum):
 def getCoeffPerp(x_t, y_t, xPrime_t1, yPrime_t1, tPy, t, t1, tNum):
     yPrime = returnValueNoAss(yPrime_t1, t1, tNum)
     xPrime = returnValueNoAss(xPrime_t1, t1, tNum)
-    if not (yPrime == sp.sympify("nan") or yPrime == sp.sympify("+oo") or yPrime == sp.sympify("-oo")): #derivative at tNum is a real number. tNun is always real so no chanche of having a derivative with non-zero immaginary part
+    if not (yPrime == sp.sympify("nan") or yPrime == sp.sympify("+oo") or yPrime == sp.sympify("-oo") or yPrime == sp.sympify("zoo")): #derivative at tNum is a real number. tNun is always real so no chanche of having a derivative with non-zero immaginary part
         yPrime_t = sp.diff(y_t, t) if isinstance(y_t, sp.Basic) else 0 #calculate the derivative with the real=True assumption, such that it returns just a number
         yPrime = returnValue(yPrime_t, tPy, t, tNum)
-    if not (xPrime == sp.sympify("nan") or xPrime == sp.sympify("+oo") or xPrime == sp.sympify("-oo")):
+    if not (xPrime == sp.sympify("nan") or xPrime == sp.sympify("+oo") or xPrime == sp.sympify("-oo") or xPrime == sp.sympify("zoo")):
         xPrime_t = sp.diff(x_t, t) if isinstance(x_t, sp.Basic) else 0
         xPrime = returnValue(xPrime_t, tPy, t, tNum)
     

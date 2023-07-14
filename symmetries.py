@@ -158,8 +158,84 @@ def points(x_t, y_t, tPy, t, tRange):
         y_tList += [returnValue(y_t, tPy, t, tNum)]
     return x_tList, y_tList
 
-def generateRange(rangeValuesList):
-    return np.hstack([np.linspace(start, stop, num=num) for start, stop, num in rangeValuesList])
+def getAbsCurvature(x_t, y_t, tPy, t, tNum):
+    t1 = sp.Symbol('t') if tPy == "t" else sp.Symbol('q')
+    x_t1 , y_t1 = x_t.subs(t, t1), y_t.subs(t, t1)
+    curv_t1 = sp.sympify(sp.Abs(sp.diff(x_t1, t1)*sp.diff(y_t1, t1, 2)-sp.diff(y_t1, t1)*sp.diff(x_t1, t1, 2))/(sp.diff(x_t1, t1)**2+sp.diff(y_t1, t1)**2)**(3/2)) #absolute curvature equation
+    curv = returnValueNoAss(curv_t1, t1, tNum)
+    if not(curv == sp.sympify("nan") or curv == sp.sympify("+oo") or curv == sp.sympify("zoo")):
+        curv_t = sp.sympify(sp.Abs(sp.diff(x_t, t)*sp.diff(y_t, t, 2)-sp.diff(y_t, t)*sp.diff(x_t, t, 2))/(sp.diff(x_t, t)**2+sp.diff(y_t, t)**2)**(3/2))
+        return returnValue(curv_t, tPy, t, tNum)
+    return curv
+
+def sortMixedList(mixedList, reverseBool):
+    num_part = sorted([i for i in mixedList if i.is_real and not (i == sp.sympify("+oo") or i == sp.sympify("zoo") or i == sp.sympify("nan"))], reverse=reverseBool)
+    notNum_part = sorted([i for i in mixedList if not i.is_real or i == sp.sympify("+oo") or i == sp.sympify("zoo") or i == sp.sympify("nan")], reverse=reverseBool)
+    notNum_partLen = len(notNum_part)
+    return num_part + notNum_part, notNum_partLen
+
+def getNum(curv, curvMax, numMax, numMin):
+    if curv >= curvMax:
+        return numMax
+    num = curv/curvMax*numMax
+    if num <= numMin:
+        return numMin
+    return num
+
+def generateRange(rangeValuesList, variableDensities=False, x_t=None, y_t=None, tPy=None, t=None):
+    for i in range(len(rangeValuesList)):
+        if len(rangeValuesList[i]) == 3:
+            rangeValuesList[i] = rangeValuesList[i] + (rangeValuesList[i][2],) #adding a numMin witch is equal to numMax inside the tuple, so to be able not to define numMin in tRangeValueList when we only want a fixed density for that interval
+    if not variableDensities: #density constant everywhere
+        return np.hstack([np.linspace(rangeValues[0], rangeValues[1], num=rangeValues[2]) for rangeValues in rangeValuesList])
+    tRange = np.array([])
+    for rangeValues in rangeValuesList:
+        if rangeValues[2] == rangeValues[3]: #density set to be constant in this interval. No need for below computations
+            tRange = np.concatenate((tRange, np.linspace(rangeValues[0], rangeValues[1], num=rangeValues[2])))
+            continue
+        Delta_t, tNum = 0, rangeValues[0]
+        tRangeCurv = np.linspace(rangeValues[0], rangeValues[1], num=rangeValues[2]) #crete a range in which evaluating curvature using highest allowed density
+        curvMax, curvList, edgeCase = 0, [], False
+        for tNumCurv in tRangeCurv:
+            curvList.append(getAbsCurvature(x_t, y_t, tPy, t, tNumCurv))
+        
+        curvListSorted, notNumLen = sortMixedList(curvList, True) #reverse=True -> sort curve from max value to min value
+        if curvListSorted[0].is_real and not curvListSorted[0] == sp.sympify("+oo") and not curvListSorted[0] == sp.sympify("zoo") and not curvListSorted[0] == sp.sympify("nan"):
+            curvMax = curvListSorted[0]
+        else:
+            edgeCase = True #complex or infinite or undefined (NaN) curvature everywhere
+        
+        if edgeCase or curvListSorted[0] == curvListSorted[-1]: #density happens to be constant in this interval
+            tRange = np.concatenate((tRange, tRangeCurv))
+            continue
+
+        if notNumLen != 0:
+            replacedValues = 0
+            for i in range(len(curvList)): #replace non real non finite or undefined curv values with curvMax
+                if not curvList[i].is_real or curvList[i] == sp.sympify("+oo") or curvList[i] == sp.sympify("zoo") or curvList[i] == sp.sympify("nan"):
+                    curvList[i] = curvMax
+                    replacedValues += 1
+                if replacedValues == notNumLen:
+                    break
+        
+        curv = 0
+        tRange = np.append(tRange, rangeValues[0])
+        while tNum < rangeValues[1]:
+            print(tRange.size)
+            if tNum == rangeValues[0]:
+                curv = curvList[0]
+            else:
+                curv = getAbsCurvature(x_t, y_t, tPy, t, tNum)
+                if not curv.is_real or curv == sp.sympify("+oo") or curv == sp.sympify("zoo") or curv == sp.sympify("nan"):
+                    curv = curvMax
+            Delta_t = (rangeValues[1]-rangeValues[0])/getNum(curv, curvMax, rangeValues[2], rangeValues[3])
+            tNum += Delta_t
+            if tNum <= rangeValues[1]:
+                tRange = np.append(tRange, tNum)
+            else:
+                tRange = np.append(tRange, rangeValues[1])
+
+    return tRange
 
 def main():
     startTime = time.time()
@@ -169,8 +245,8 @@ def main():
     tPy = "t"
     xMirror_t = 4*sp.cos(t)*sp.cos(t)*sp.cos(t) #placeholder function
     yMirror_t = 4*sp.sin(t)*sp.sin(t)*sp.sin(t) #placeholder function
-    tRangeValuesList = [(0, 2*np.pi, 2500)] #placeholder range and density. The tuples are (start, stop, num), (extension_start, extension_stop, extension_num) etc
-    tRange = generateRange(tRangeValuesList)
+    tRangeValuesList = [(0, 2*np.pi, 10000, 1500)] #placeholder range and densities. The tuples are (start, stop, numMx, numMin[optional]), (extension_start, extension_stop, extension_numMax, extension_numMin[optional]) etc. Note that it has to be such that start < stop, etc
+    tRange = generateRange(tRangeValuesList, True, xMirror_t, yMirror_t, tPy, t)
     #tRangePlot = np.linspace(0, 2*np.pi, num=100) #full parameter range to have a smooth plot of the curve, albeit doing the reflection calculations only for the limited interval of tRange
     tRangePlot = tRange
 

@@ -127,7 +127,15 @@ def coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, 
 def mirror(xSegmentList, ySegmentList, qNum_1List, qNum_2List, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, t, tRange, tPy, qPy, currentProcess, nProcesses, mirroredShared):
     tRange = islice(tRange, currentProcess, len(tRange), nProcesses)
     t1 = sp.Symbol('t')
-    xMirror_t1, yMirror_t1 = xMirror_t.subs(t, t1), yMirror_t.subs(t, t1)
+    xMirror_t1, yMirror_t1 = None, None
+    if t in sp.sympify(xMirror_t).free_symbols:
+        xMirror_t1 = xMirror_t.subs(t, t1)
+    else:
+        xMirror_t1 = xMirror_t
+    if t in sp.sympify(yMirror_t).free_symbols:
+        yMirror_t1 = yMirror_t.subs(t, t1)
+    else:
+        yMirror_t1 = yMirror_t
     xPrime_t1 = sp.diff(xMirror_t1, t1) if isinstance(xMirror_t1, sp.Basic) else 0 #evaluating complex derivatives to avoid sympy inaccuracies due to assumptions (eg. sign(0) = 0 instead of nan)
     yPrime_t1 = sp.diff(yMirror_t1, t1) if isinstance(yMirror_t1, sp.Basic) else 0
     for tNum in tRange:
@@ -160,7 +168,15 @@ def points(x_t, y_t, tPy, t, tRange):
 
 def getAbsCurvature(x_t, y_t, tPy, t, tNum):
     t1 = sp.Symbol('t') if tPy == "t" else sp.Symbol('q')
-    x_t1 , y_t1 = x_t.subs(t, t1), y_t.subs(t, t1)
+    x_t1, y_t1 = None, None
+    if t in sp.sympify(x_t).free_symbols:
+        x_t1 = x_t.subs(t, t1)
+    else:
+        x_t1 = x_t
+    if t in sp.sympify(y_t).free_symbols:
+        y_t1 = y_t.subs(t, t1)
+    else:
+        y_t1 = y_t
     curv_t1 = sp.sympify(sp.Abs(sp.diff(x_t1, t1)*sp.diff(y_t1, t1, 2)-sp.diff(y_t1, t1)*sp.diff(x_t1, t1, 2))/(sp.diff(x_t1, t1)**2+sp.diff(y_t1, t1)**2)**(3/2)) #absolute curvature equation
     curv = returnValueNoAss(curv_t1, t1, tNum)
     if not(curv == sp.sympify("nan") or curv == sp.sympify("+oo") or curv == sp.sympify("zoo")):
@@ -245,7 +261,7 @@ def main():
     tPy = "t"
     xMirror_t = 4*sp.cos(t)*sp.cos(t)*sp.cos(t) #placeholder function
     yMirror_t = 4*sp.sin(t)*sp.sin(t)*sp.sin(t) #placeholder function
-    tRangeValuesList = [(0, 2*np.pi, 10000, 1500)] #placeholder range and densities. The tuples are (start, stop, numMx, numMin[optional]), (extension_start, extension_stop, extension_numMax, extension_numMin[optional]) etc. Note that it has to be such that start < stop, etc
+    tRangeValuesList = [(0, 2*np.pi, 4000, 1500)] #placeholder range and densities. The tuples are (start, stop, numMx, numMin[optional]), (extension_start, extension_stop, extension_numMax, extension_numMin[optional]) etc. Note that it has to be such that start < stop, etc
     tRange = generateRange(tRangeValuesList, True, xMirror_t, yMirror_t, tPy, t)
     #tRangePlot = np.linspace(0, 2*np.pi, num=100) #full parameter range to have a smooth plot of the curve, albeit doing the reflection calculations only for the limited interval of tRange
     tRangePlot = tRange

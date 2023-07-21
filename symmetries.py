@@ -185,10 +185,15 @@ def getAbsCurvature(x_t, y_t, tPy, t, tNum):
     return curv
 
 def sortMixedList(mixedList, reverseBool):
+    notNum_part = []
+    for i in mixedList:
+        if not i.is_real or i == sp.sympify("+oo") or i == sp.sympify("zoo") or i == sp.sympify("nan"):
+            notNum_part.append(i)
     num_part = sorted([i for i in mixedList if i.is_real and not (i == sp.sympify("+oo") or i == sp.sympify("zoo") or i == sp.sympify("nan"))], reverse=reverseBool)
-    notNum_part = sorted([i for i in mixedList if not i.is_real or i == sp.sympify("+oo") or i == sp.sympify("zoo") or i == sp.sympify("nan")], reverse=reverseBool)
     notNum_partLen = len(notNum_part)
-    return num_part + notNum_part, notNum_partLen
+    if notNum_partLen != 0:
+        return num_part + notNum_part, notNum_partLen
+    return num_part, notNum_partLen
 
 def getNum(curv, curvMax, numMax, numMin):
     if curv >= curvMax:

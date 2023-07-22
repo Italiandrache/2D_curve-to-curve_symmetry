@@ -28,6 +28,10 @@ The functionality of the ```generateRange``` function has been enhanced to autom
 
 Automatic density adjustment can be beneficial in certain cases where higher precision is needed while keeping ```<variable>Range``` relatively small so as not to massively increase computation time. However, it may not always achieve the desired outcome and it sometimes may increase computation time depending on how the parameters are set and on the curve's curvature. Moreover, curvature is only defined for twice differentiable curves, so user discretion is advised.
 
-Known Issues:
+KNOWN ISSUES:
 
-As of right now, some piecewise defined curves might lead to inaccurate mirroring.
+~~As of right now, some piecewise defined curves might lead to inaccurate mirroring.~~ (fixed with update 1.2.4)
+
+UPDATE 1.2.4:
+
+WIP Update Readme

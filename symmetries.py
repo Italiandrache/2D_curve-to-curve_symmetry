@@ -48,7 +48,7 @@ def getCoeffPerp(x_t, y_t, xPrime_t1, yPrime_t1, tPy, t, t1, tNum):
     else: #yPrime == 0
         return np.inf
 
-def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange):
+def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange, tIntervals = ()):
     xSegmentList = []
     ySegmentList = []
     tNum_1List = []
@@ -60,6 +60,21 @@ def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange):
         xToBeMirrored_1, yToBeMirrored_1, real_1 = curve(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tNum_1)
         xToBeMirrored_2, yToBeMirrored_2, real_2 = curve(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tNum_2)
         if not real_1 or not real_2:
+            continue
+        piecewiseExep = False
+        if len(tIntervals) != 0:
+            tIntervalsList = []
+            if isinstance(xToBeMirrored_t, sp.Piecewise) or isinstance(yToBeMirrored_t, sp.Piecewise):
+                for tInterval in tIntervals:
+                    tValMin, tValMax = tInterval.args[0], tInterval.args[1]
+                    tValMinOpen, tValMaxOpen = tInterval.args[2], tInterval.args[3]
+                    tIntervalsList.append(((tValMin, tValMinOpen), (tValMax, tValMaxOpen)))
+            for k in range(len(tIntervalsList)-1):
+                if sp.sympify(tNum_1) == sp.sympify(tIntervalsList[k][1][0]) and sp.sympify(tNum_1) == sp.sympify(tIntervalsList[k+1][0][0]) and (tIntervalsList[k][1][1] == False or tIntervalsList[k+1][0][1] == False):
+                    if xToBeMirrored_1 != xToBeMirrored_2 or yToBeMirrored_1 != yToBeMirrored_2:
+                        piecewiseExep = True
+                        continue
+        if piecewiseExep:
             continue
         xSegmentList += [xToBeMirrored_1+q*(xToBeMirrored_2-xToBeMirrored_1)]
         ySegmentList += [yToBeMirrored_1+q*(yToBeMirrored_2-yToBeMirrored_1)]
@@ -268,7 +283,7 @@ def generateRange(rangeValuesList, variableDensities=False, x_t=None, y_t=None, 
 def main():
     startTime = time.time()
     
-    mirrorName = "Mirror" #placeholder name. Beware of only usig valid string characters
+    mirrorName = "Mirror" #placeholder name. Beware of only using valid string characters
     t = sp.Symbol('t', real = True) #mirror
     tPy = "t"
     xMirror_t = 4*sp.cos(t)*sp.cos(t)*sp.cos(t) #placeholder function
@@ -284,19 +299,20 @@ def main():
     xToBeMirrored_q = 4*sp.cos(q) #placeholder function
     yToBeMirrored_q = 4*sp.sin(q) #placeholder function
     qRangeValuesList = [(0, 2*np.pi, 200)] #increasing these num values vastly increases computation time
+    #qIntervals = (sp.Interval(firstPieceStart, firstPieceStop), sp.Interval.Lopen(secondPieceStart, secondPieceStop), etc)
     qRange = generateRange(qRangeValuesList)
 
     plt.figure(num=0, dpi=150)
 
     xMirrorList, yMirrorList = points(xMirror_t, yMirror_t, tPy, t, tRangePlot)
-    plt.plot(xMirrorList, yMirrorList)
+    plt.plot(xMirrorList, yMirrorList, '.') if (isinstance(xMirror_t, sp.Piecewise) or isinstance(yMirror_t, sp.Piecewise)) else plt.plot(xMirrorList, yMirrorList)
     xToBeMirroredList, yToBeMirroredList = points(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange)
-    plt.plot(xToBeMirroredList, yToBeMirroredList)
+    plt.plot(xToBeMirroredList, yToBeMirroredList, '.') if (isinstance(xToBeMirrored_q, sp.Piecewise) or isinstance(yToBeMirrored_q, sp.Piecewise)) else plt.plot(xToBeMirroredList, yToBeMirroredList)
 
     manager = multiprocessing.Manager()
     mirroredShared = manager.list()
 
-    xSegmentList, ySegmentList, qNum_1List, qNum_2List = segment(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange)
+    xSegmentList, ySegmentList, qNum_1List, qNum_2List = segment(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange) #, qIntervals)
     nProcesses, activeProcesses = 10, []
     for i in range(0, nProcesses):
         process = multiprocessing.Process(target=mirror, args=(xSegmentList, ySegmentList, qNum_1List, qNum_2List, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, t, tRange, tPy, qPy, i, nProcesses, mirroredShared))

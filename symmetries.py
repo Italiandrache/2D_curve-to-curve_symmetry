@@ -8,19 +8,19 @@ import time
 
 def notReal(x_t, tPy, t, tNum):
     t = sp.Symbol('t', real = True) if tPy == "t" else sp.Symbol('q', real = True) 
-    if isinstance(x_t, sp.Basic):
+    if t in sp.sympify(x_t).free_symbols:
         if not x_t.subs(t, tNum).is_real:
             return True
     return False
 
 def returnValue(x_t, tPy, t, tNum):
     t = sp.Symbol('t', real = True) if tPy == "t" else sp.Symbol('q', real = True)
-    if isinstance(x_t, sp.Basic):
+    if t in sp.sympify(x_t).free_symbols:
         return x_t.subs(t, tNum)
     return x_t
 
 def returnValueNoAss(x_t, t, tNum):
-    if isinstance(x_t, sp.Basic):
+    if t in sp.sympify(x_t).free_symbols:
         return x_t.subs(t, tNum)
     return x_t
 
@@ -208,7 +208,11 @@ def generateRange(rangeValuesList, variableDensities=False, x_t=None, y_t=None, 
         if len(rangeValuesList[i]) == 3:
             rangeValuesList[i] = rangeValuesList[i] + (rangeValuesList[i][2],) #adding a numMin witch is equal to numMax inside the tuple, so to be able not to define numMin in tRangeValueList when we only want a fixed density for that interval
     if not variableDensities: #density constant everywhere
-        return np.hstack([np.linspace(rangeValues[0], rangeValues[1], num=rangeValues[2]) for rangeValues in rangeValuesList])
+        tRange = np.hstack([np.linspace(rangeValues[0], rangeValues[1], num=rangeValues[2]) for rangeValues in rangeValuesList])
+        for i in reversed(range(1, len(tRange))):
+            if tRange[i] == tRange[i-1]:
+                tRange = np.delete(tRange, i)
+        return tRange
     tRange = np.array([])
     for rangeValues in rangeValuesList:
         if rangeValues[2] == rangeValues[3]: #density set to be constant in this interval. No need for below computations
@@ -256,6 +260,9 @@ def generateRange(rangeValuesList, variableDensities=False, x_t=None, y_t=None, 
             else:
                 tRange = np.append(tRange, rangeValues[1])
 
+    for i in reversed(range(1, len(tRange))):
+        if tRange[i] == tRange[i-1]:
+            tRange = np.delete(tRange, i)
     return tRange
 
 def main():

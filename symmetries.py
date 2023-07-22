@@ -61,7 +61,7 @@ def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange, tIntervals = ()):
         xToBeMirrored_2, yToBeMirrored_2, real_2 = curve(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tNum_2)
         if not real_1 or not real_2:
             continue
-        piecewiseExep = False
+        piecewiseExcep = False
         if len(tIntervals) != 0:
             tIntervalsList = []
             if isinstance(xToBeMirrored_t, sp.Piecewise) or isinstance(yToBeMirrored_t, sp.Piecewise):
@@ -72,9 +72,9 @@ def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange, tIntervals = ()):
             for k in range(len(tIntervalsList)-1):
                 if sp.sympify(tNum_1) == sp.sympify(tIntervalsList[k][1][0]) and sp.sympify(tNum_1) == sp.sympify(tIntervalsList[k+1][0][0]) and (tIntervalsList[k][1][1] == False or tIntervalsList[k+1][0][1] == False):
                     if xToBeMirrored_1 != xToBeMirrored_2 or yToBeMirrored_1 != yToBeMirrored_2:
-                        piecewiseExep = True
+                        piecewiseExcep = True
                         continue
-        if piecewiseExep:
+        if piecewiseExcep:
             continue
         xSegmentList += [xToBeMirrored_1+q*(xToBeMirrored_2-xToBeMirrored_1)]
         ySegmentList += [yToBeMirrored_1+q*(yToBeMirrored_2-yToBeMirrored_1)]

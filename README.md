@@ -33,4 +33,4 @@ UPDATE 1.2.4:
 
 ~~As of right now, some piecewise defined curves might lead to inaccurate mirroring.~~ (fixed with update 1.2.4)
 
-To ensure proper symmetries for piecewise defined curves, define them with domain intervals arranged in ascending order and populate ```tRangeValuesList``` with tuples whose ```start``` and ```stop``` values coincide with the domain intervals boundaries of the curve. Moreover, if the to-be-mirrored curve is a piecewise-defined curve, initialize ```qIntervals``` as a tuple of sympy's Intervals and pass it as the last argument to the ```segment``` function.
+To ensure proper symmetries for piecewise defined curves, define them with domain intervals arranged in ascending order and populate ```<parameter>RangeValuesList``` with tuples whose ```start``` (```extensionStart```) and ```stop``` (```extensionStop```) values coincide with the domain intervals boundaries of the curve. Moreover, if the to-be-mirrored curve is a piecewise-defined curve, initialize ```qIntervals``` as a tuple of sympy's Intervals and pass it as the last argument to the ```segment``` function.

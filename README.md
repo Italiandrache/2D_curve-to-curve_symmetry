@@ -28,10 +28,9 @@ The functionality of the ```generateRange``` function has been enhanced to autom
 
 Automatic density adjustment can be beneficial in certain cases where higher precision is needed while keeping ```<variable>Range``` relatively small so as not to massively increase computation time. However, it may not always achieve the desired outcome and it sometimes may increase computation time depending on how the parameters are set and on the curve's curvature. Moreover, curvature is only defined for twice differentiable curves, so user discretion is advised.
 
-KNOWN ISSUES:
-
-~~As of right now, some piecewise defined curves might lead to inaccurate mirroring.~~ (fixed with update 1.2.4)
 
 UPDATE 1.2.4:
 
-WIP Update Readme
+~~As of right now, some piecewise defined curves might lead to inaccurate mirroring.~~ (fixed with update 1.2.4)
+
+To ensure proper symmetries for piecewise defined curves, define them with domain intervals arranged in ascending order and populate ```tRangeValuesList``` with tuples whose ```start``` and ```stop``` values coincide with the domain intervals boundaries of the curve. Moreover, if the to-be-mirrored curve is a piecewise-defined curve, initialize ```qIntervals``` as a tuple of sympy's Intervals and pass it as the last argument to the ```segment``` function.

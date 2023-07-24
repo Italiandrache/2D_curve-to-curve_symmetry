@@ -73,7 +73,7 @@ def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange, tIntervals = ()):
                 if sp.sympify(tNum_1) == sp.sympify(tIntervalsList[k][1][0]) and sp.sympify(tNum_1) == sp.sympify(tIntervalsList[k+1][0][0]) and (tIntervalsList[k][1][1] == False or tIntervalsList[k+1][0][1] == False):
                     if xToBeMirrored_1 != xToBeMirrored_2 or yToBeMirrored_1 != yToBeMirrored_2:
                         piecewiseExcep = True
-                        continue
+                        break
         if piecewiseExcep:
             continue
         xSegmentList += [xToBeMirrored_1+q*(xToBeMirrored_2-xToBeMirrored_1)]

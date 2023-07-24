@@ -166,9 +166,9 @@ def mirror(xSegmentList, ySegmentList, qNum_1List, qNum_2List, xMirror_t, yMirro
                 pass
         intersections = intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, qNum_2List, tNum, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, tPy, qPy)
         for i in intersections:
-            mirroredShared.append(calcSimm(xMirror, yMirror, i[0], i[1]))
+            mirroredShared.append(calcSymm(xMirror, yMirror, i[0], i[1]))
 
-def calcSimm(xMirror, yMirror, xToBeMirroredIntersection, yToBeMirroredIntersection):
+def calcSymm(xMirror, yMirror, xToBeMirroredIntersection, yToBeMirroredIntersection):
     return (2*xMirror-xToBeMirroredIntersection, 2*yMirror-yToBeMirroredIntersection)
 
 def points(x_t, y_t, tPy, t, tRange):

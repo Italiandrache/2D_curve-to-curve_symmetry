@@ -85,6 +85,17 @@ def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange, tIntervals = ()):
 def solveSystemOfLinearEqs(x_q, x_r, y_q, y_r, q, r):
     sp.linsolve([x_q-x_r, y_q-y_r], q, r)
 
+def isMaxTimeExceeded(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1, qNum_2, tPy, qPy, maxTime, segmentNum, coeff):
+    xMirror = returnValue(xMirror_t, tPy, t, tNum)
+    yMirror = returnValue(yMirror_t, tPy, t, tNum)
+    xToBeMirrored_1 = returnValue(xToBeMirrored_q, qPy, q, qNum_1)
+    xToBeMirrored_2 = returnValue(xToBeMirrored_q, qPy, q, qNum_2)
+    yToBeMirrored_1 = returnValue(yToBeMirrored_q, qPy, q, qNum_1)
+    yToBeMirrored_2 = returnValue(yToBeMirrored_q, qPy, q, qNum_2)
+    if xToBeMirrored_1 == xToBeMirrored_2 or abs(coeff - (yToBeMirrored_2 - yToBeMirrored_1)/(xToBeMirrored_2 - xToBeMirrored_1)) <= 0.00001:
+        return linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, segmentNum)[1]
+    return False
+
 def intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, qNum_2List, tNum, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, tPy, qPy, maxTime):
     intersections = []
     q = sp.Symbol('q', real = True)
@@ -112,14 +123,7 @@ def intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, q
             qNum, rNum = list(intersection)[0] #if the same, qNum is symbolical. If without intersections, length is 0
             if r in qNum.free_symbols or q in qNum.free_symbols:
                 if i == 0:
-                    xMirror = returnValue(xMirror_t, tPy, t, tNum)
-                    yMirror = returnValue(yMirror_t, tPy, t, tNum)
-                    xToBeMirrored_1 = returnValue(xToBeMirrored_q, qPy, q, qNum_1List[i])
-                    xToBeMirrored_2 = returnValue(xToBeMirrored_q, qPy, q, qNum_2List[i])
-                    yToBeMirrored_1 = returnValue(yToBeMirrored_q, qPy, q, qNum_1List[i])
-                    yToBeMirrored_2 = returnValue(yToBeMirrored_q, qPy, q, qNum_2List[i])
-                    if xToBeMirrored_1 == xToBeMirrored_2 or abs(coeff - (yToBeMirrored_2 - yToBeMirrored_1)/(xToBeMirrored_2 - xToBeMirrored_1)) <= 0.00001:
-                        timeExceeded = linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, i)[1]
+                    timeExceeded = isMaxTimeExceeded(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], tPy, qPy, maxTime, i, coeff)
                 coin, toBeMirrored_1Tuple, toBeMirrored_2Tuple = coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], coeff, tPy, qPy, maxTime, i, timeExceeded)
                 if coin:
                     intersections += [toBeMirrored_1Tuple]
@@ -132,14 +136,7 @@ def intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, q
             #probably just a continue would do
             if len(list(intersection)) != 0:
                 if i == 0:
-                    xMirror = returnValue(xMirror_t, tPy, t, tNum)
-                    yMirror = returnValue(yMirror_t, tPy, t, tNum)
-                    xToBeMirrored_1 = returnValue(xToBeMirrored_q, qPy, q, qNum_1List[i])
-                    xToBeMirrored_2 = returnValue(xToBeMirrored_q, qPy, q, qNum_2List[i])
-                    yToBeMirrored_1 = returnValue(yToBeMirrored_q, qPy, q, qNum_1List[i])
-                    yToBeMirrored_2 = returnValue(yToBeMirrored_q, qPy, q, qNum_2List[i])
-                    if xToBeMirrored_1 == xToBeMirrored_2 or abs(coeff - (yToBeMirrored_2 - yToBeMirrored_1)/(xToBeMirrored_2 - xToBeMirrored_1)) <= 0.00001:
-                        timeExceeded = linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, i)[1]
+                    timeExceeded = isMaxTimeExceeded(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], tPy, qPy, maxTime, i, coeff)
                 coin, toBeMirrored_1Tuple, toBeMirrored_2Tuple = coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], coeff, tPy, qPy, maxTime, i, timeExceeded)
                 if coin:
                     intersections += [toBeMirrored_1Tuple]

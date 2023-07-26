@@ -99,7 +99,7 @@ def intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, q
         try: #could be done more efficiently with some if/else
             if maxTimeExceeded:
                 break
-            if maxTime is not None and isinstance(tNum, sp.Basic) and i == 0: #check time only for the first intersection, if it exceeds the maxTime once, it probably will every time
+            if maxTime is not None and isinstance(tNum, sp.Basic) and i == 0: #check time only for the first intersection, if it exceeds maxTime once, it probably will every time
                 subprocess = multiprocessing.Process(target = solveSystemOfLinearEqs, args = (xSegmentList[i], xLine_r, ySegmentList[i], yLine_r, q, r))
                 subprocess.start()
                 subprocess.join(maxTime) #wait either maxTime seconds or for the process to finish, whichever is faster
@@ -135,7 +135,7 @@ def linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2
     b = sp.Symbol('b', real = True)
     if segmentNum == 0:
         maxTimeExceeded = False
-    if maxTimeExceeded:
+    if maxTimeExceeded: #if it exceeds maxTime once, it probably will every time
         return (True, True)
     if maxTime is not None and isinstance(tNum, sp.Basic) and segmentNum == 0:
         subprocess = multiprocessing.Process(target = solveSystemOfLinearEqs, args = (a*(xToBeMirrored_1-xMirror), -b*(xToBeMirrored_2-xMirror), a*(yToBeMirrored_1-yMirror), -b*(yToBeMirrored_2-yMirror), a, b))

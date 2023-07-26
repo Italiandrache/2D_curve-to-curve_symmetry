@@ -99,7 +99,7 @@ def intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, q
         try: #could be done more efficiently with some if/else
             if maxTimeExceeded:
                 break
-            if maxTime is not None and isinstance(tNum, sp.Basic) and i == 0: #check time only for the first intersection, if it exceeds maxTime once, it probably will every time
+            if maxTime is not None and isinstance(tNum, sp.Basic) and i == 0: #check time only for the first intersection, if it exceeds maxTime once, it probably will every time and vice versa
                 subprocess = multiprocessing.Process(target = solveSystemOfLinearEqs, args = (xSegmentList[i], xLine_r, ySegmentList[i], yLine_r, q, r))
                 subprocess.start()
                 subprocess.join(maxTime) #wait either maxTime seconds or for the process to finish, whichever is faster

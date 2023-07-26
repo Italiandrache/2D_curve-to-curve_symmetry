@@ -161,9 +161,9 @@ def coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, 
     yToBeMirrored_1 = returnValue(yToBeMirrored_q, qPy, q, qNum_1)
     yToBeMirrored_2 = returnValue(yToBeMirrored_q, qPy, q, qNum_2)
     if xToBeMirrored_1 == xToBeMirrored_2:
-        if not linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, segmentNum, linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, segmentNum)[1])[0]:
+        if not linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, segmentNum, linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, 0)[1])[0]:
             return (True, (xToBeMirrored_1, yToBeMirrored_1), (xToBeMirrored_2, yToBeMirrored_2))
-    elif abs(coeff - (yToBeMirrored_2 - yToBeMirrored_1)/(xToBeMirrored_2 - xToBeMirrored_1)) <= 0.00001 and not linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, segmentNum, linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, segmentNum)[1])[0]:
+    elif abs(coeff - (yToBeMirrored_2 - yToBeMirrored_1)/(xToBeMirrored_2 - xToBeMirrored_1)) <= 0.00001 and not linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, segmentNum, linIndip(xMirror, yMirror, xToBeMirrored_1, yToBeMirrored_1, xToBeMirrored_2, yToBeMirrored_2, maxTime, tNum, 0)[1])[0]:
         return (True, (xToBeMirrored_1, yToBeMirrored_1), (xToBeMirrored_2, yToBeMirrored_2))
     return (False, (0, 0), (0, 0))
 

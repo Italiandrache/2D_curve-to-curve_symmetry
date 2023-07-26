@@ -122,7 +122,7 @@ def intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, q
             intersection = sp.linsolve([xSegmentList[i]-xLine_r, ySegmentList[i]-yLine_r], q, r)
             qNum, rNum = list(intersection)[0] #if the same, qNum is symbolical. If without intersections, length is 0
             if r in qNum.free_symbols or q in qNum.free_symbols:
-                if maxTime is not None and i == 0:
+                if maxTime is not None and isinstance(tNum, sp.Basic) and i == 0:
                     timeExceeded = isMaxTimeExceeded(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], tPy, qPy, maxTime, i, coeff)
                 coin, toBeMirrored_1Tuple, toBeMirrored_2Tuple = coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], coeff, tPy, qPy, maxTime, i, timeExceeded)
                 if coin:
@@ -135,7 +135,7 @@ def intersect(xMirror, yMirror, coeff, xSegmentList, ySegmentList, qNum_1List, q
         except IndexError:
             #probably just a continue would do
             if len(list(intersection)) != 0:
-                if maxTime is not None and i == 0:
+                if maxTime is not None and isinstance(tNum, sp.Basic) and i == 0:
                     timeExceeded = isMaxTimeExceeded(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], tPy, qPy, maxTime, i, coeff)
                 coin, toBeMirrored_1Tuple, toBeMirrored_2Tuple = coincident(xMirror_t, yMirror_t, t, tNum, xToBeMirrored_q, yToBeMirrored_q, q, qNum_1List[i], qNum_2List[i], coeff, tPy, qPy, maxTime, i, timeExceeded)
                 if coin:

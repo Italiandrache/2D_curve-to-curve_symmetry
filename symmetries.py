@@ -333,11 +333,11 @@ def addValues(tRange, valuesList):
         for i in range(0, len(tRange)-1):
             if value == tRange[i] or value == tRange[i+1]:
                 break
-            if value.evalf() == tRange[i]:
+            if sp.sympify(value).evalf() == tRange[i]:
                 del tRange[i]
                 tRange.insert(i, value)
                 break
-            if value.evalf() == tRange[i+1]:
+            if sp.sympify(value).evalf() == tRange[i+1]:
                 del tRange[i+1]
                 tRange.insert(i+1, value)
                 break

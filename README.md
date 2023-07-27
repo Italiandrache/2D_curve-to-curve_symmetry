@@ -37,7 +37,7 @@ To ensure proper symmetries for piecewise defined curves, define them with domai
 
 UPDATE 1.3.0:
 
-Sometimes, it proves necessary to examine the mirror image for a specific set of points within ```qRange```; moreover, in certain cases, relying solely on numerical approximations for the values of these points might not suffice. To address this, the function ```addValues``` enables you to specify a list of points to be added to ```<parameter>Range```.
+Sometimes, it proves necessary to examine the mirror image for a specific set of points within ```tRange```; moreover, in certain cases, relying solely on numerical approximations for the values of these points might not suffice. To address this, the function ```addValues``` enables you to specify a list of points to be added to ```<parameter>Range```.
 
 Please be aware that evaluating intersections for exact sympy symbolical values could sometimes be highly time-consuming. To prevent waiting indefinitely for the intersections of a single point to be computed, the ```mirror``` function has the option to include a ```maxTime``` value as the last argument of its call. The ```maxTime``` value determines the maximum duration, in seconds, for which you are willing to wait for the intersections computation to conclude when ```tVal``` is an instance of ```sp.Basic```.
 

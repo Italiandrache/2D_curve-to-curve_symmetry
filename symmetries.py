@@ -39,7 +39,7 @@ def getCoeffPerp(x_t, y_t, xPrime_t1, yPrime_t1, tPy, t, t1, tNum):
         xPrime_t = sp.diff(x_t, t) if isinstance(x_t, sp.Basic) else 0
         xPrime = returnValue(xPrime_t, tPy, t, tNum)
     
-    if yPrime == sp.sympify("nan") or xPrime == sp.sympify("nan") or (not yPrime.is_real and not xPrime.is_real) or (yPrime == 0 and xPrime == 0):
+    if yPrime == sp.sympify("nan") or xPrime == sp.sympify("nan") or (not sp.sympify(yPrime).is_real and not sp.sympify(xPrime).is_real) or (yPrime == 0 and xPrime == 0):
         return "nan"
     elif yPrime != 0 and xPrime != 0:
         return -xPrime/yPrime #-1/coeff tan

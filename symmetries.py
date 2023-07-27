@@ -328,7 +328,7 @@ def addValues(tRange, valuesList):
             tRange.insert(0, value)
             continue
         if value > tRange[-1]:
-            tRange.append(tRange, value)
+            tRange.append(value)
             continue
         for i in range(0, len(tRange)-1):
             if value == tRange[i] or value == tRange[i+1]:

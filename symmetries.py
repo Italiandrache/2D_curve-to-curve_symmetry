@@ -357,7 +357,7 @@ def main():
     tRangeValuesList = [(0, 2*np.pi, 4000, 1500)] #placeholder range and densities. The tuples are (start, stop, numMx, numMin[optional]), (extension_start, extension_stop, extension_numMax, extension_numMin[optional]) etc. Note that it has to be such that start < stop, etc
     tRange = generateRange(tRangeValuesList, True, xMirror_t, yMirror_t, tPy, t)
     #tRangePlot = np.linspace(0, 2*np.pi, num=100) #full parameter range to have a smooth plot of the curve, albeit doing the reflection calculations only for the limited interval of tRange
-    #tRange = addValues(tRange, [sp.Rational(sp.pi, 2), sp.pi, sp.Rational(3, 2)*sp.pi, 2*sp.pi])
+    tRange = addValues(tRange, [sp.Rational(sp.pi, 2), sp.pi, sp.Rational(3, 2)*sp.pi, 2*sp.pi])
     tRangePlot = tRange
 
     toBeMirroredName = "ToBeMirrored" #Placeholder name. Beware of only using valid string characters

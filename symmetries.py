@@ -66,10 +66,19 @@ def segment(xToBeMirrored_t, yToBeMirrored_t, tPy, t, tRange, tIntervals = ()):
             tIntervalsList = []
             if isinstance(xToBeMirrored_t, sp.Piecewise) or isinstance(yToBeMirrored_t, sp.Piecewise):
                 for tInterval in tIntervals:
-                    tValMin, tValMax = tInterval.args[0], tInterval.args[1]
-                    tValMinOpen, tValMaxOpen = tInterval.args[2], tInterval.args[3]
+                    tValMin, tValMax, tValMinOpen, tValMaxOpen = None, None, None, None
+                    if len(tInterval.args) == 1:
+                        tValMin, tValMax = tInterval.args[0], tInterval.args[0]
+                        tValMinOpen, tValMaxOpen = False, False
+                    else:
+                        tValMin, tValMax = tInterval.args[0], tInterval.args[1]
+                        tValMinOpen, tValMaxOpen = tInterval.args[2], tInterval.args[3]
                     tIntervalsList.append(((tValMin, tValMinOpen), (tValMax, tValMaxOpen)))
             for k in range(len(tIntervalsList)-1):
+                if sp.sympify(tNum_2) == sp.sympify(tIntervalsList[k][1][0]) and tIntervalsList[k][0][0] == tIntervalsList[k][1][0]:
+                    if xToBeMirrored_1 != xToBeMirrored_2 or yToBeMirrored_1 != yToBeMirrored_2:
+                        piecewiseExcep = True
+                        break
                 if sp.sympify(tNum_1) == sp.sympify(tIntervalsList[k][1][0]) and sp.sympify(tNum_1) == sp.sympify(tIntervalsList[k+1][0][0]) and (tIntervalsList[k][1][1] == False or tIntervalsList[k+1][0][1] == False):
                     if xToBeMirrored_1 != xToBeMirrored_2 or yToBeMirrored_1 != yToBeMirrored_2:
                         piecewiseExcep = True

@@ -46,4 +46,5 @@ This time check, although sometimes necessary, is not perfect. Since there is no
 KNOWN ISSUES:
 
 Isolated points of piecewise defined curves are not mirrored.
+
 Straight sections of the to-be-mirrored curve that are perpendicular to the mirror curve at some given points, are not mirrored if said points are not present inside ```tRange```.

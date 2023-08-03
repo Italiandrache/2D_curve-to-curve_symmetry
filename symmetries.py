@@ -354,7 +354,14 @@ def addValues(tRange, valuesList):
                 tRange.insert(i+1, value)
                 break
     return tRange
-    
+
+def discontinuousDomain(tRangeValuesList):
+    if len(tRangeValuesList) > 1:
+        for i in range(len(tRangeValuesList) - 1):
+            if tRangeValuesList[i][1] != tRangeValuesList[i+1][0]:
+                return True
+    return False
+
 def main():
     startTime = time.time()
     
@@ -383,9 +390,9 @@ def main():
     plt.figure(num=0, dpi=150)
 
     xMirrorList, yMirrorList = points(xMirror_t, yMirror_t, tPy, t, tRangePlot)
-    plt.plot(xMirrorList, yMirrorList, '.') if (isinstance(xMirror_t, sp.Piecewise) or isinstance(yMirror_t, sp.Piecewise)) else plt.plot(xMirrorList, yMirrorList)
+    plt.plot(xMirrorList, yMirrorList, '.') if (isinstance(xMirror_t, sp.Piecewise) or isinstance(yMirror_t, sp.Piecewise) or discontinuousDomain(tRangeValuesList)) else plt.plot(xMirrorList, yMirrorList)
     xToBeMirroredList, yToBeMirroredList = points(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange)
-    plt.plot(xToBeMirroredList, yToBeMirroredList, '.') if (isinstance(xToBeMirrored_q, sp.Piecewise) or isinstance(yToBeMirrored_q, sp.Piecewise)) else plt.plot(xToBeMirroredList, yToBeMirroredList)
+    plt.plot(xToBeMirroredList, yToBeMirroredList, '.') if (isinstance(xToBeMirrored_q, sp.Piecewise) or isinstance(yToBeMirrored_q, sp.Piecewise) or discontinuousDomain(qRangeValuesList)) else plt.plot(xToBeMirroredList, yToBeMirroredList)
 
     manager = multiprocessing.Manager()
     mirroredShared = manager.list()

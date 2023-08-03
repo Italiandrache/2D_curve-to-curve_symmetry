@@ -20,7 +20,7 @@ Finally, the code generates a plot showcasing the two parametric curves along wi
 
 ~~KNOWN BUG~~ (fixed with update 1.1.2):
 
-~~As I had to make the assumption of using real-valued symbols, there may be certain cases in which sympy might not provide the accurate value in the ```getCoeffPerp``` function. For instance, if ```yPrime_t == float("sign(t)")```, then yPrime at tNum=0 should return ```float("nan")```. However, due to the assumption that the expression always is a real value, it is forced to return a real number, resulting in a value of 0 instead. This may lead to inaccurate mirroring, by reflecting points that shouldn't be.~~
+~~As I had to make the assumption of using real-valued symbols, there may be certain cases in which sympy might not provide the accurate value in the ```getCoeffPerp``` function. For instance, if ```yPrime_t == sp.sympify("sign(t)")```, then yPrime at tNum=0 should return ```sp.sympify("nan")```. However, due to the assumption that the expression is always a real value, it is forced to return a real number, resulting in a value of 0 instead. This may lead to inaccurate mirroring, by reflecting points that shouldn't be.~~
 
 UPDATE 1.2.0:
 

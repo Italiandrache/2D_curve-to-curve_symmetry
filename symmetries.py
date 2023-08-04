@@ -355,11 +355,13 @@ def addValues(tRange, valuesList):
                 break
     return tRange
 
-def discontinuousDomain(tRangeValuesList):
+def discontinuousDomain(tRangeValuesList, tRange):
     if len(tRangeValuesList) > 1:
         for i in range(len(tRangeValuesList) - 1):
             if tRangeValuesList[i][1] != tRangeValuesList[i+1][0]:
                 return True
+    if sp.sympify(tRange[0]).evalf() < sp.sympify(tRangeValuesList[0][0]).evalf() or sp.sympify(tRange[-1]).evalf() > sp.sympify(tRangeValuesList[-1][1]).evalf():
+        return True
     return False
 
 def main():
@@ -370,10 +372,10 @@ def main():
     tPy = "t"
     xMirror_t = 4*sp.cos(t)*sp.cos(t)*sp.cos(t) #placeholder function
     yMirror_t = 4*sp.sin(t)*sp.sin(t)*sp.sin(t) #placeholder function
-    tRangeValuesList = [(0, 2*np.pi, 4000, 1500)] #placeholder range and densities. The tuples are (start, stop, numMx, numMin[optional]), (extension_start, extension_stop, extension_numMax, extension_numMin[optional]) etc. Note that it has to be such that start < stop, etc
+    tRangeValuesList = [(-np.pi/4, np.pi/4, 1000, 375), (np.pi/4, 3/4*np.pi, 1000, 375), (3/4*np.pi, 5/4*np.pi, 1000, 375), (5/4*np.pi, 7/4*np.pi, 1000, 375)] #placeholder range and densities. The tuples are (start, stop, numMx, numMin[optional]), (extension_start, extension_stop, extension_numMax, extension_numMin[optional]) etc. Note that it has to be such that start < stop, etc
     tRange = generateRange(tRangeValuesList, True, xMirror_t, yMirror_t, tPy, t)
     #tRangePlot = np.linspace(0, 2*np.pi, num=100) #full parameter range to have a smooth plot of the curve, albeit doing the reflection calculations only for the limited interval of tRange
-    tRange = addValues(tRange, [sp.Rational(1, 2)*sp.pi, sp.pi, sp.Rational(3, 2)*sp.pi, 2*sp.pi])
+    tRange = addValues(tRange, [-sp.Rational(1, 4)*sp.pi, sp.Rational(1, 4)*sp.pi, sp.Rational(1, 2)*sp.pi, sp.Rational(3, 4)*sp.pi, sp.Rational(5, 4)*sp.pi, sp.pi, sp.Rational(3, 2)*sp.pi, sp.Rational(7, 4)*sp.pi, 2*sp.pi])
     tRangePlot = tRange
 
     toBeMirroredName = "ToBeMirrored" #Placeholder name. Beware of only using valid string characters
@@ -390,9 +392,9 @@ def main():
     plt.figure(num=0, dpi=150)
 
     xMirrorList, yMirrorList = points(xMirror_t, yMirror_t, tPy, t, tRangePlot)
-    plt.plot(xMirrorList, yMirrorList, '.') if (isinstance(xMirror_t, sp.Piecewise) or isinstance(yMirror_t, sp.Piecewise) or discontinuousDomain(tRangeValuesList)) else plt.plot(xMirrorList, yMirrorList)
+    plt.plot(xMirrorList, yMirrorList, '.') if (isinstance(xMirror_t, sp.Piecewise) or isinstance(yMirror_t, sp.Piecewise) or discontinuousDomain(tRangeValuesList, tRange)) else plt.plot(xMirrorList, yMirrorList)
     xToBeMirroredList, yToBeMirroredList = points(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange)
-    plt.plot(xToBeMirroredList, yToBeMirroredList, '.') if (isinstance(xToBeMirrored_q, sp.Piecewise) or isinstance(yToBeMirrored_q, sp.Piecewise) or discontinuousDomain(qRangeValuesList)) else plt.plot(xToBeMirroredList, yToBeMirroredList)
+    plt.plot(xToBeMirroredList, yToBeMirroredList, '.') if (isinstance(xToBeMirrored_q, sp.Piecewise) or isinstance(yToBeMirrored_q, sp.Piecewise) or discontinuousDomain(qRangeValuesList, qRange)) else plt.plot(xToBeMirroredList, yToBeMirroredList)
 
     manager = multiprocessing.Manager()
     mirroredShared = manager.list()

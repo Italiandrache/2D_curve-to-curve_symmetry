@@ -32,7 +32,7 @@ def curve(x_t, y_t, tPy, t, tNum):
 def getCoeffPerp(x_t, y_t, xPrime_t1, yPrime_t1, tPy, t, t1, tNum):
     yPrime = returnValueNoAss(yPrime_t1, t1, tNum)
     xPrime = returnValueNoAss(xPrime_t1, t1, tNum)
-    if not (yPrime == sp.sympify("nan") or yPrime == sp.sympify("+oo") or yPrime == sp.sympify("-oo") or yPrime == sp.sympify("zoo")): #derivative at tNum is a real number. tNum is always real so no chanche of having a derivative with non-zero immaginary part
+    if not (yPrime == sp.sympify("nan") or yPrime == sp.sympify("+oo") or yPrime == sp.sympify("-oo") or yPrime == sp.sympify("zoo")): #derivative at tNum is a real number. tNum is always real so no chance of having a derivative with non-zero imaginary part
         yPrime_t = sp.diff(y_t, t) if isinstance(y_t, sp.Basic) else 0 #calculate the derivative with the real=True assumption, such that it returns just a number
         yPrime = returnValue(yPrime_t, tPy, t, tNum)
     if not (xPrime == sp.sympify("nan") or xPrime == sp.sympify("+oo") or xPrime == sp.sympify("-oo") or xPrime == sp.sympify("zoo")):
@@ -284,7 +284,7 @@ def generateRange(rangeValuesList, variableDensities=False, x_t=None, y_t=None, 
             tRange = np.concatenate((tRange, np.linspace(rangeValues[0], rangeValues[1], num=rangeValues[2])))
             continue
         Delta_t, tNum = 0, rangeValues[0]
-        tRangeCurv = np.linspace(rangeValues[0], rangeValues[1], num=rangeValues[2]) #crete a range in which evaluating curvature using highest allowed density
+        tRangeCurv = np.linspace(rangeValues[0], rangeValues[1], num=rangeValues[2]) #crete a range in which evaluating curvature using the highest allowed density
         curvMax, curvList, edgeCase = 0, [], False
         for tNumCurv in tRangeCurv:
             curvList.append(getAbsCurvature(x_t, y_t, tPy, t, tNumCurv))
@@ -301,7 +301,7 @@ def generateRange(rangeValuesList, variableDensities=False, x_t=None, y_t=None, 
 
         if notNumLen != 0:
             replacedValues = 0
-            for i in range(len(curvList)): #replace non real non finite or undefined curv values with curvMax
+            for i in range(len(curvList)): #replace non-real non-finite or undefined curv values with curvMax
                 if not curvList[i].is_real or curvList[i] == sp.sympify("+oo") or curvList[i] == sp.sympify("zoo") or curvList[i] == sp.sympify("nan"):
                     curvList[i] = curvMax
                     replacedValues += 1
@@ -375,7 +375,7 @@ def main():
     tRangeValuesList = [(-np.pi/4, np.pi/4, 1000, 375), (np.pi/4, 3/4*np.pi, 1000, 375), (3/4*np.pi, 5/4*np.pi, 1000, 375), (5/4*np.pi, 7/4*np.pi, 1000, 375)] #placeholder range and densities. The tuples are (start, stop, numMx, numMin[optional]), (extension_start, extension_stop, extension_numMax, extension_numMin[optional]) etc. Note that it has to be such that start < stop, etc
     tRange = generateRange(tRangeValuesList, True, xMirror_t, yMirror_t, tPy, t)
     #tRangePlot = np.linspace(0, 2*np.pi, num=100) #full parameter range to have a smooth plot of the curve, albeit doing the reflection calculations for the interval of tRange
-    tRange = addValues(tRange, [-sp.Rational(1, 4)*sp.pi, sp.Rational(1, 4)*sp.pi, sp.Rational(1, 2)*sp.pi, sp.Rational(3, 4)*sp.pi, sp.Rational(5, 4)*sp.pi, sp.pi, sp.Rational(3, 2)*sp.pi, sp.Rational(7, 4)*sp.pi, 2*sp.pi])
+    tRange = addValues(tRange, [-sp.Rational(1, 4)*sp.pi, 0, sp.Rational(1, 4)*sp.pi, sp.Rational(1, 2)*sp.pi, sp.Rational(3, 4)*sp.pi, sp.Rational(5, 4)*sp.pi, sp.pi, sp.Rational(3, 2)*sp.pi, sp.Rational(7, 4)*sp.pi])
     tRangePlot = tRange
 
     toBeMirroredName = "ToBeMirrored" #placeholder name. Beware of only using valid string characters

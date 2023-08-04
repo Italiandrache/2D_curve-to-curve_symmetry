@@ -374,18 +374,19 @@ def main():
     yMirror_t = 4*sp.sin(t)*sp.sin(t)*sp.sin(t) #placeholder function
     tRangeValuesList = [(-np.pi/4, np.pi/4, 1000, 375), (np.pi/4, 3/4*np.pi, 1000, 375), (3/4*np.pi, 5/4*np.pi, 1000, 375), (5/4*np.pi, 7/4*np.pi, 1000, 375)] #placeholder range and densities. The tuples are (start, stop, numMx, numMin[optional]), (extension_start, extension_stop, extension_numMax, extension_numMin[optional]) etc. Note that it has to be such that start < stop, etc
     tRange = generateRange(tRangeValuesList, True, xMirror_t, yMirror_t, tPy, t)
-    #tRangePlot = np.linspace(0, 2*np.pi, num=100) #full parameter range to have a smooth plot of the curve, albeit doing the reflection calculations only for the limited interval of tRange
+    #tRangePlot = np.linspace(0, 2*np.pi, num=100) #full parameter range to have a smooth plot of the curve, albeit doing the reflection calculations for the interval of tRange
     tRange = addValues(tRange, [-sp.Rational(1, 4)*sp.pi, sp.Rational(1, 4)*sp.pi, sp.Rational(1, 2)*sp.pi, sp.Rational(3, 4)*sp.pi, sp.Rational(5, 4)*sp.pi, sp.pi, sp.Rational(3, 2)*sp.pi, sp.Rational(7, 4)*sp.pi, 2*sp.pi])
     tRangePlot = tRange
 
-    toBeMirroredName = "ToBeMirrored" #Placeholder name. Beware of only using valid string characters
+    toBeMirroredName = "ToBeMirrored" #placeholder name. Beware of only using valid string characters
     q = sp.Symbol('q', real = True) #to be mirrored
     qPy = "q"
     xToBeMirrored_q = 4*sp.cos(q) #placeholder function
     yToBeMirrored_q = 4*sp.sin(q) #placeholder function
     qRangeValuesList = [(0, 2*np.pi, 200)] #increasing these num values vastly increases computation time
-    #qIntervals = (sp.Interval(firstPieceStart, firstPieceStop), sp.Interval.Lopen(secondPieceStart, secondPieceStop), etc)
+    qIntervals = () #qIntervals = (sp.Interval(firstPieceStart, firstPieceStop), sp.Interval.Lopen(secondPieceStart, secondPieceStop), etc)
     qRange = generateRange(qRangeValuesList)
+    qRangePlot = qRange
 
     maxTime = None #2
     
@@ -393,13 +394,13 @@ def main():
 
     xMirrorList, yMirrorList = points(xMirror_t, yMirror_t, tPy, t, tRangePlot)
     plt.plot(xMirrorList, yMirrorList, '.') if (isinstance(xMirror_t, sp.Piecewise) or isinstance(yMirror_t, sp.Piecewise) or discontinuousDomain(tRangeValuesList, tRange)) else plt.plot(xMirrorList, yMirrorList)
-    xToBeMirroredList, yToBeMirroredList = points(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange)
+    xToBeMirroredList, yToBeMirroredList = points(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRangePlot)
     plt.plot(xToBeMirroredList, yToBeMirroredList, '.') if (isinstance(xToBeMirrored_q, sp.Piecewise) or isinstance(yToBeMirrored_q, sp.Piecewise) or discontinuousDomain(qRangeValuesList, qRange)) else plt.plot(xToBeMirroredList, yToBeMirroredList)
 
     manager = multiprocessing.Manager()
     mirroredShared = manager.list()
 
-    xSegmentList, ySegmentList, qNum_1List, qNum_2List = segment(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange) #, qIntervals)
+    xSegmentList, ySegmentList, qNum_1List, qNum_2List = segment(xToBeMirrored_q, yToBeMirrored_q, qPy, q, qRange, qIntervals)
     nProcesses, activeProcesses = 10, []
     for i in range(0, nProcesses):
         process = multiprocessing.Process(target=mirror, args=(xSegmentList, ySegmentList, qNum_1List, qNum_2List, xMirror_t, yMirror_t, xToBeMirrored_q, yToBeMirrored_q, t, tRange, tPy, qPy, i, nProcesses, mirroredShared, maxTime))

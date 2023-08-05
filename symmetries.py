@@ -410,8 +410,8 @@ def main():
         process.join()
     xMirroredList, yMirroredList = [], []
     for mirroredPoints in mirroredShared:
-        xMirroredList.append(mirroredPoints[0])
-        yMirroredList.append(mirroredPoints[1])
+        xMirroredList.append(sp.sympify(mirroredPoints[0]).evalf())
+        yMirroredList.append(sp.sympify(mirroredPoints[1]).evalf())
     plt.plot(xMirroredList, yMirroredList, '.')
 
     with open(f'{toBeMirroredName}_from_{mirrorName}.csv', "w+") as file1:
